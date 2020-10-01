@@ -1,3 +1,4 @@
+import './styles.css';
 import Slider from './slider';
 
 function createSlider() {

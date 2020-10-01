@@ -1,0 +1,16 @@
+.knob {
+    border-radius: 50%;
+    height: 20px;
+    width: 20px;
+    position: absolute;
+    background-color: black;
+    top:10px
+}
+
+.innerContainer {
+    position: absolute;
+}
+
+.circle{
+    position: relative;
+}

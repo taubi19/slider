@@ -20,9 +20,12 @@ export default class Slider {
     const cx = width / 2;
     const cy = height / 2;
     const circumference = 2 * Math.PI * r;
+    const step = 10;
+    const max = 100;
+    const min = 10;// default value?
     const NAMESPACE = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(NAMESPACE, 'svg');
-
+    svg.classList.add('circle');
     svg.setAttribute('width', width);
     svg.setAttribute('height', height);
 
@@ -44,9 +47,28 @@ export default class Slider {
     progressCircle.style.fill = 'transparent';
     progressCircle.style.stroke = '#ebebeb';
 
+    const input = document.createElement('input');
+    input.type = 'number';
+    input.max = max;
+    input.min = min;
+    input.step = step;
+
+    const initialTranslateX = cx - strokeWidth;
+    const initialTranslateY = 0;
+    const knob = document.createElement('div');
+    knob.classList.add('knob');
+    knob.style.transform = `translate(${initialTranslateX}px, ${initialTranslateY}px)`;
+    // knob.style.transform = 'translate(90px,0px)';
+
     svg.appendChild(placeholderCircle);
     svg.appendChild(progressCircle);
 
-    this.container.appendChild(svg);
+    const innerContainer = document.createElement('div');
+    innerContainer.classList.add('innerContainer');
+
+    innerContainer.appendChild(svg);
+    innerContainer.appendChild(knob);
+    innerContainer.appendChild(input);
+    this.container.appendChild(innerContainer);
   }
 }
