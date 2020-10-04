@@ -9,6 +9,8 @@ export default class Slider {
     this.step = step;
     this.radius = radius;
 
+    this.mouseDown = false;
+
     this.createSlider();
   }
 
@@ -16,10 +18,10 @@ export default class Slider {
     const width = 200;
     const height = 200;
     const strokeWidth = 10;
-    const r = width / 2 - strokeWidth * 2;
+    this.r = width / 2 - strokeWidth * 2;
     const cx = width / 2;
     const cy = height / 2;
-    const circumference = 2 * Math.PI * r;
+    const circumference = 2 * Math.PI * this.r;
     const step = 10;
     const max = 100;
     const min = 10;// default value?
@@ -32,7 +34,7 @@ export default class Slider {
     const placeholderCircle = document.createElementNS(NAMESPACE, 'circle');
     placeholderCircle.setAttribute('cx', cx);
     placeholderCircle.setAttribute('cy', cy);
-    placeholderCircle.setAttribute('r', r);
+    placeholderCircle.setAttribute('r', this.r);
     placeholderCircle.setAttribute('stroke-width', strokeWidth);
     placeholderCircle.setAttribute('stroke-dasharray', '4 1');
     placeholderCircle.style.fill = 'none';
@@ -41,7 +43,7 @@ export default class Slider {
     const progressCircle = document.createElementNS(NAMESPACE, 'circle');
     progressCircle.setAttribute('cx', cx);
     progressCircle.setAttribute('cy', cy);
-    progressCircle.setAttribute('r', r);
+    progressCircle.setAttribute('r', this.r);
     progressCircle.setAttribute('stroke-width', strokeWidth);
     progressCircle.setAttribute('stroke-dashoffset', 10);
     progressCircle.style.fill = 'transparent';
@@ -58,7 +60,7 @@ export default class Slider {
     const knob = document.createElement('div');
     knob.classList.add('knob');
     knob.style.transform = `translate(${initialTranslateX}px, ${initialTranslateY}px)`;
-    // knob.style.transform = 'translate(90px,0px)';
+    this.knob = knob;
 
     svg.appendChild(placeholderCircle);
     svg.appendChild(progressCircle);
@@ -70,5 +72,29 @@ export default class Slider {
     innerContainer.appendChild(knob);
     innerContainer.appendChild(input);
     this.container.appendChild(innerContainer);
+
+    knob.addEventListener('mousedown', this.startMoveKnob.bind(this));
+    document.addEventListener('mousemove', this.moveKnob.bind(this));
+  }
+
+  startMoveKnob(e) {
+    this.mouseDown = true;
+    document.addEventListener('mouseup', this.endMoveKnob.bind(this));
+  }
+
+  endMoveKnob() {
+    this.mouseDown = false;
+  }
+
+  moveKnob(e) {
+    if (!this.mouseDown) return;
+    console.log('x', e.pageX, 'y', e.pageY);
+    const radAlpha = Math.atan2(e.pageY, e.pageX); // in rad
+
+    const x = Math.cos(radAlpha) * this.r;
+    const y = Math.sin(radAlpha) * this.r;
+
+    this.point = { x, y };
+    this.knob.style.transform = `translate(${x}px, ${y}px)`;
   }
 }
