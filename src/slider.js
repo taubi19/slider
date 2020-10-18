@@ -22,6 +22,7 @@ export default class Slider {
     const cx = width / 2;
     const cy = height / 2;
     const circumference = 2 * Math.PI * this.r;
+
     const step = 10;
     const max = 100;
     const min = 10;// default value?
@@ -88,13 +89,17 @@ export default class Slider {
 
   moveKnob(e) {
     if (!this.mouseDown) return;
-    console.log('x', e.pageX, 'y', e.pageY);
-    const radAlpha = Math.atan2(e.pageY, e.pageX); // in rad
 
-    const x = Math.cos(radAlpha) * this.r;
-    const y = Math.sin(radAlpha) * this.r;
+    const radAlpha = Math.atan2(
+      e.pageY - 100, // 100 width/height
+      e.pageX - 100,
+    );
+
+    const x = 80 + Math.cos(radAlpha) * this.r;
+    const y = 80 + Math.sin(radAlpha) * this.r;
 
     this.point = { x, y };
-    this.knob.style.transform = `translate(${x}px, ${y}px)`;
+    console.log('POINT AFTER MOVE', this.point);
+    this.knob.style.transform = `translate(${this.point.x}px, ${this.point.y}px)`;
   }
 }
