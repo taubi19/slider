@@ -6,7 +6,6 @@ export default class Slider {
     this.min = min;
     this.step = step;
     this.radius = radius;
-
     this.mouseDown = false;
 
     this.createSlider();
@@ -15,11 +14,13 @@ export default class Slider {
   createSlider() {
     const width = 200;
     const height = 200;
-    this.strokeWidth = 10;
-    this.r = width / 2 - this.strokeWidth * 2;
     const cx = width / 2;
     const cy = height / 2;
-    const circumference = 2 * Math.PI * this.r;
+    this.strokeWidth = 10;
+    this.r = width / 2 - this.strokeWidth * 2;
+
+    this.circumference = 2 * Math.PI * this.r;
+    // console.log("this.circumference", this.circumference);
 
     const step = 10;
     const max = 100;
@@ -31,22 +32,28 @@ export default class Slider {
     svg.setAttribute("height", height);
 
     const placeholderCircle = document.createElementNS(NAMESPACE, "circle");
+    placeholderCircle.classList.add("placeholder-circle");
     placeholderCircle.setAttribute("cx", cx);
     placeholderCircle.setAttribute("cy", cy);
     placeholderCircle.setAttribute("r", this.r);
     placeholderCircle.setAttribute("stroke-width", this.strokeWidth);
     placeholderCircle.setAttribute("stroke-dasharray", "4 1");
     placeholderCircle.style.fill = "none";
-    placeholderCircle.style.stroke = "#e6e6e6";
+    placeholderCircle.style.stroke = "#808080";
 
     const progressCircle = document.createElementNS(NAMESPACE, "circle");
+    progressCircle.classList.add("progress-circle");
     progressCircle.setAttribute("cx", cx);
     progressCircle.setAttribute("cy", cy);
     progressCircle.setAttribute("r", this.r);
     progressCircle.setAttribute("stroke-width", this.strokeWidth);
-    progressCircle.setAttribute("stroke-dashoffset", 10);
+    progressCircle.setAttribute("stroke-dashoffset", this.circumference);
+    progressCircle.setAttribute("stroke-dasharray", this.circumference);
+    progressCircle.style.transform = "rotate(-90deg)";
+    progressCircle.style["transform-origin"] = "50% 50%";
     progressCircle.style.fill = "transparent";
-    progressCircle.style.stroke = "#ebebeb";
+    progressCircle.style.stroke = "#e6e";
+    this.progressCircle = progressCircle;
 
     const input = document.createElement("input");
     input.type = "number";
@@ -87,11 +94,7 @@ export default class Slider {
 
   moveKnob(e) {
     if (!this.mouseDown) return;
-
-    const radAlpha = Math.atan2(
-      e.pageY - 100, // 100 width/height
-      e.pageX - 100
-    );
+    const radAlpha = Math.atan2(e.pageY - 100, e.pageX - 100);
 
     const x = 80 + Math.cos(radAlpha) * this.r;
     const y = 80 + Math.sin(radAlpha) * this.r;
@@ -100,5 +103,15 @@ export default class Slider {
     this.knob.style.transform = `translate(${
       this.point.x + this.strokeWidth
     }px, ${this.point.y}px)`;
+
+    let degAlpha = (radAlpha * 180) / Math.PI + 90;
+    degAlpha = (degAlpha + 360) % 360; // from radians to full circle
+    this.setProgress(degAlpha);
+  }
+
+  setProgress(degAlpha) {
+    let circumferencePercent = degAlpha / 360; // percent of the whole circumference
+    const v = this.circumference * (1 - circumferencePercent); // dashoffset doesn't mean the full arc but the empty
+    this.progressCircle.setAttribute("stroke-dashoffset", v);
   }
 }
