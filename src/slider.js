@@ -81,6 +81,8 @@ export default class Slider {
 
     knob.addEventListener("mousedown", this.startMoveKnob.bind(this));
     document.addEventListener("mousemove", this.moveKnob.bind(this));
+    placeholderCircle.addEventListener("click", this.moveKnob.bind(this));
+    progressCircle.addEventListener("click", this.moveKnob.bind(this));
   }
 
   startMoveKnob(e) {
@@ -93,7 +95,7 @@ export default class Slider {
   }
 
   moveKnob(e) {
-    if (!this.mouseDown) return;
+    if (!this.mouseDown && e.type != "click") return;
     const radAlpha = Math.atan2(e.pageY - 100, e.pageX - 100);
 
     const x = 80 + Math.cos(radAlpha) * this.r;
