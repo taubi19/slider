@@ -79,15 +79,26 @@ export default class Slider {
     innerContainer.appendChild(input);
     this.container.appendChild(innerContainer);
 
+    // mouse events
     knob.addEventListener("mousedown", this.startMoveKnob.bind(this));
     document.addEventListener("mousemove", this.moveKnob.bind(this));
     placeholderCircle.addEventListener("click", this.moveKnob.bind(this));
     progressCircle.addEventListener("click", this.moveKnob.bind(this));
+
+    // touch events
+
+    knob.addEventListener("touchstart", this.startTouchKnob.bind(this));
+    document.addEventListener("touchmove", this.moveKnob.bind(this));
   }
 
   startMoveKnob(e) {
     this.mouseDown = true;
     document.addEventListener("mouseup", this.endMoveKnob.bind(this));
+  }
+
+  startTouchKnob(e) {
+    this.mouseDown = true;
+    document.addEventListener("touchend", this.endMoveKnob.bind(this));
   }
 
   endMoveKnob() {
@@ -96,7 +107,23 @@ export default class Slider {
 
   moveKnob(e) {
     if (!this.mouseDown && e.type != "click") return;
-    const radAlpha = Math.atan2(e.pageY - 100, e.pageX - 100);
+
+    const coords = {};
+    if (
+      e.type === "touchstart" ||
+      e.type === "touchend" ||
+      e.type === "touchmove"
+    ) {
+      e.preventDefault();
+      console.log("touch", e);
+      coords.x = e.touches[0].clientX;
+      coords.y = e.touches[0].clientY;
+    } else {
+      coords.x = e.pageX;
+      coords.y = e.pageY;
+    }
+
+    const radAlpha = Math.atan2(coords.y - 100, coords.x - 100);
 
     const x = 80 + Math.cos(radAlpha) * this.r;
     const y = 80 + Math.sin(radAlpha) * this.r;
