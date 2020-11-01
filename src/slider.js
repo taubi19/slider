@@ -33,7 +33,6 @@ export default class Slider {
     this.r = width / 2 - this.strokeWidth * 2;
 
     this.circumference = 2 * Math.PI * this.r;
-    // console.log("this.circumference", this.circumference);
 
     const NAMESPACE = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(NAMESPACE, "svg");
@@ -70,6 +69,8 @@ export default class Slider {
     input.max = this.max;
     input.min = this.min;
     input.step = this.step;
+    input.value = this.min;
+    this.input = input;
 
     const initialTranslateX = cx - this.strokeWidth;
     const initialTranslateY = 0;
@@ -125,7 +126,6 @@ export default class Slider {
       e.type === "touchmove"
     ) {
       e.preventDefault();
-      console.log("touch", e);
       coords.x = e.touches[0].clientX;
       coords.y = e.touches[0].clientY;
     } else {
@@ -151,6 +151,15 @@ export default class Slider {
   setProgress(degAlpha) {
     let circumferencePercent = degAlpha / 360; // percent of the whole circumference
     const v = this.circumference * (1 - circumferencePercent); // dashoffset doesn't mean the full arc but the empty
+
+    // set visual representation
     this.progressCircle.setAttribute("stroke-dashoffset", v);
+    // update input value
+    const value = Math.ceil(
+      (this.input.max - this.min) * circumferencePercent + this.min
+    );
+    if (value % this.step === 0) {
+      this.input.value = value;
+    }
   }
 }
