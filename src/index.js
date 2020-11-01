@@ -1,8 +1,8 @@
-import './styles.css';
-import Slider from './slider';
+import "./styles.css";
+import Slider from "./slider";
 
 function createSlider() {
-  const slider = new Slider({ container: document.body });
+  const slider = new Slider({ container: document.body, color: "#e6e6" });
 }
 
 createSlider();

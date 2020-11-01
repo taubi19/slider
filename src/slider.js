@@ -1,7 +1,20 @@
 export default class Slider {
   constructor({ container, color, max, min, step, radius }) {
+    const defaultValues = {
+      color: "#000000",
+    };
+    if (container == null) {
+      throw new Error(
+        "You need to specify the container for the slider to work."
+      );
+    }
+    if (color == null) {
+      console.warn(
+        "Color missing. You should set the slider color as a parameter to new slider. Using default color: black"
+      );
+    }
     this.container = container;
-    this.color = color;
+    this.color = color != null ? color : defaultValues.color;
     this.max = max;
     this.min = min;
     this.step = step;
@@ -22,9 +35,6 @@ export default class Slider {
     this.circumference = 2 * Math.PI * this.r;
     // console.log("this.circumference", this.circumference);
 
-    const step = 10;
-    const max = 100;
-    const min = 10; // default value?
     const NAMESPACE = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(NAMESPACE, "svg");
     svg.classList.add("circle");
@@ -52,14 +62,14 @@ export default class Slider {
     progressCircle.style.transform = "rotate(-90deg)";
     progressCircle.style["transform-origin"] = "50% 50%";
     progressCircle.style.fill = "transparent";
-    progressCircle.style.stroke = "#e6e";
+    progressCircle.style.stroke = this.color;
     this.progressCircle = progressCircle;
 
     const input = document.createElement("input");
     input.type = "number";
-    input.max = max;
-    input.min = min;
-    input.step = step;
+    input.max = this.max;
+    input.min = this.min;
+    input.step = this.step;
 
     const initialTranslateX = cx - this.strokeWidth;
     const initialTranslateY = 0;
