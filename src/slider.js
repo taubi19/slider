@@ -25,11 +25,12 @@ export default class Slider {
   }
 
   createSlider() {
-    const width = 200;
-    const height = 200;
+    const width = this.radius * 2;
+    const height = this.radius * 2;
     const cx = width / 2;
     const cy = height / 2;
     this.strokeWidth = 10;
+    // inner radius
     this.r = width / 2 - this.strokeWidth * 2;
 
     this.circumference = 2 * Math.PI * this.r;
@@ -70,6 +71,7 @@ export default class Slider {
     input.min = this.min;
     input.step = this.step;
     input.value = this.min;
+    input.style.display = "none";
     this.input = input;
 
     const initialTranslateX = cx - this.strokeWidth;
@@ -89,6 +91,7 @@ export default class Slider {
     innerContainer.appendChild(knob);
     innerContainer.appendChild(input);
     this.container.appendChild(innerContainer);
+    this.innerContainer = innerContainer;
 
     // mouse events
     knob.addEventListener("mousedown", this.startMoveKnob.bind(this));
@@ -99,7 +102,9 @@ export default class Slider {
     // touch events
 
     knob.addEventListener("touchstart", this.startTouchKnob.bind(this));
-    document.addEventListener("touchmove", this.moveKnob.bind(this));
+    document.addEventListener("touchmove", this.moveKnob.bind(this), {
+      passive: false,
+    });
   }
 
   startMoveKnob(e) {
@@ -126,17 +131,17 @@ export default class Slider {
       e.type === "touchmove"
     ) {
       e.preventDefault();
-      coords.x = e.touches[0].clientX;
-      coords.y = e.touches[0].clientY;
+      coords.x = e.touches[0].clientX - this.innerContainer.offsetLeft;
+      coords.y = e.touches[0].clientY - this.innerContainer.offsetTop;
     } else {
-      coords.x = e.pageX;
-      coords.y = e.pageY;
+      coords.x = e.pageX - this.innerContainer.offsetLeft;
+      coords.y = e.pageY - this.innerContainer.offsetTop;
     }
+    console.log(coords);
+    const radAlpha = Math.atan2(coords.y - this.radius, coords.x - this.radius);
 
-    const radAlpha = Math.atan2(coords.y - 100, coords.x - 100);
-
-    const x = 80 + Math.cos(radAlpha) * this.r;
-    const y = 80 + Math.sin(radAlpha) * this.r;
+    const x = this.r + Math.cos(radAlpha) * this.r;
+    const y = this.r + Math.sin(radAlpha) * this.r;
 
     this.point = { x, y };
     this.knob.style.transform = `translate(${
@@ -154,10 +159,10 @@ export default class Slider {
 
     // set visual representation
     this.progressCircle.setAttribute("stroke-dashoffset", v);
-    // update input value
     const value = Math.ceil(
       (this.input.max - this.min) * circumferencePercent + this.min
     );
+    // update input value regarding to step value
     if (value % this.step === 0) {
       this.input.value = value;
     }
