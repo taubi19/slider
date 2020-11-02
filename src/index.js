@@ -8,19 +8,21 @@ function createSlider() {
 
   const slider1 = new Slider({
     container,
-    color: "#e6e6",
+    color: "#338433",
     min: 0,
     max: 200,
     step: 15,
     radius: 200,
+    name: "Transportation",
   });
   const slider2 = new Slider({
     container,
-    color: "#e6e6",
+    color: "#4482dd",
     min: 0,
     max: 150,
     step: 15,
     radius: 150,
+    name: "Entertainment",
   });
   const slider3 = new Slider({
     container,
@@ -29,6 +31,7 @@ function createSlider() {
     max: 200,
     step: 15,
     radius: 100,
+    name: "Food",
   });
 }
 

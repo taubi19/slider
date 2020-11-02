@@ -31,3 +31,20 @@ body,
 .circle {
   position: relative;
 }
+
+.legendContainer {
+  position: absolute;
+  display: inline-block;
+  top: 80%;
+  left: 35%;
+}
+
+.legend-item-color {
+  width: 16px;
+  height: 16px;
+  margin-left: 10px;
+  display: inline-block;
+}
+.legend-item-name {
+  margin-left: 15px;
+}

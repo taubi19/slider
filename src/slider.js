@@ -1,5 +1,5 @@
 export default class Slider {
-  constructor({ container, color, max, min, step, radius }) {
+  constructor({ container, color, max, min, step, radius, name }) {
     const defaultValues = {
       color: "#000000",
     };
@@ -13,25 +13,56 @@ export default class Slider {
         "Color missing. You should set the slider color as a parameter to new slider. Using default color: black"
       );
     }
+
+    // class options
     this.container = container;
     this.color = color != null ? color : defaultValues.color;
     this.max = max;
     this.min = min;
     this.step = step;
     this.radius = radius;
+    this.name = name;
+
+    // class members
+    this.circumference = null;
+    this.sliderContainer = null;
+    this.legendContainer = null;
+    this.innerContainer = null;
+    this.knob = null;
+    this.strokeWidth = null;
+    this.r = null; // inner radius (without stroke width)
     this.mouseDown = false;
 
+    this.createContainers();
     this.createSlider();
+  }
+
+  createContainers() {
+    const createContainer = (container, className) => {
+      let elm = container.querySelector("." + className);
+      if (!elm) {
+        elm = document.createElement("div");
+        elm.classList.add(className);
+        container.appendChild(elm);
+      }
+      return elm;
+    };
+
+    // if sliderContainer and legendContainer don't exist, create them at first slider initialization
+    this.sliderContainer = createContainer(this.container, "sliderContainer");
+    this.sliderContainer.classList.add("container");
+    this.legendContainer = createContainer(this.container, "legendContainer");
   }
 
   createSlider() {
     const width = this.radius * 2;
     const height = this.radius * 2;
+
     const cx = width / 2;
     const cy = height / 2;
+
     this.strokeWidth = 10;
-    // inner radius
-    this.r = width / 2 - this.strokeWidth * 2;
+    this.r = width / 2 - this.strokeWidth * 2; // inner radius
 
     this.circumference = 2 * Math.PI * this.r;
 
@@ -65,14 +96,24 @@ export default class Slider {
     progressCircle.style.stroke = this.color;
     this.progressCircle = progressCircle;
 
-    const input = document.createElement("input");
-    input.type = "number";
-    input.max = this.max;
-    input.min = this.min;
-    input.step = this.step;
-    input.value = this.min;
-    input.style.display = "none";
-    this.input = input;
+    const legendItem = document.createElement("div");
+    legendItem.classList.add("legend-item");
+    const legendItemValue = document.createElement("span");
+    legendItemValue.classList.add("legend-item-value");
+    legendItemValue.textContent = this.min;
+    const legendItemColor = document.createElement("span");
+    legendItemColor.classList.add("legend-item-color");
+    legendItemColor.style.backgroundColor = this.color;
+    const legendItemName = document.createElement("span");
+    legendItemName.textContent = this.name;
+    legendItemName.classList.add("legend-item-name");
+
+    legendItem.appendChild(legendItemValue);
+    legendItem.appendChild(legendItemColor);
+    legendItem.appendChild(legendItemName);
+
+    this.legendItemValue = legendItemValue;
+    this.legendContainer.appendChild(legendItem);
 
     const initialTranslateX = cx - this.strokeWidth;
     const initialTranslateY = 0;
@@ -89,8 +130,7 @@ export default class Slider {
 
     innerContainer.appendChild(svg);
     innerContainer.appendChild(knob);
-    innerContainer.appendChild(input);
-    this.container.appendChild(innerContainer);
+    this.sliderContainer.appendChild(innerContainer);
     this.innerContainer = innerContainer;
 
     // mouse events
@@ -137,7 +177,7 @@ export default class Slider {
       coords.x = e.pageX - this.innerContainer.offsetLeft;
       coords.y = e.pageY - this.innerContainer.offsetTop;
     }
-    console.log(coords);
+
     const radAlpha = Math.atan2(coords.y - this.radius, coords.x - this.radius);
 
     const x = this.r + Math.cos(radAlpha) * this.r;
@@ -160,11 +200,11 @@ export default class Slider {
     // set visual representation
     this.progressCircle.setAttribute("stroke-dashoffset", v);
     const value = Math.ceil(
-      (this.input.max - this.min) * circumferencePercent + this.min
+      (this.max - this.min) * circumferencePercent + this.min
     );
     // update input value regarding to step value
     if (value % this.step === 0) {
-      this.input.value = value;
+      this.legendItemValue.textContent = value;
     }
   }
 }
