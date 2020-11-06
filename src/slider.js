@@ -1,3 +1,4 @@
+const NAMESPACE = "http://www.w3.org/2000/svg";
 export default class Slider {
   constructor({ container, color, max, min, step, radius, name }) {
     const defaultValues = {
@@ -48,7 +49,8 @@ export default class Slider {
       return elm;
     };
 
-    // if sliderContainer and legendContainer don't exist, create them at first slider initialization
+    // if sliderContainer and legendContainer don't exist, create them at first slider
+    //  initialization
     this.sliderContainer = createContainer(this.container, "sliderContainer");
     this.sliderContainer.classList.add("container");
     this.legendContainer = createContainer(this.container, "legendContainer");
@@ -66,35 +68,26 @@ export default class Slider {
 
     this.circumference = 2 * Math.PI * this.r;
 
-    const NAMESPACE = "http://www.w3.org/2000/svg";
     const svg = document.createElementNS(NAMESPACE, "svg");
     svg.classList.add("circle");
     svg.setAttribute("width", width);
     svg.setAttribute("height", height);
 
-    const placeholderCircle = document.createElementNS(NAMESPACE, "circle");
-    placeholderCircle.classList.add("placeholder-circle");
-    placeholderCircle.setAttribute("cx", cx);
-    placeholderCircle.setAttribute("cy", cy);
-    placeholderCircle.setAttribute("r", this.r);
-    placeholderCircle.setAttribute("stroke-width", this.strokeWidth);
-    placeholderCircle.setAttribute("stroke-dasharray", "4 1");
-    placeholderCircle.style.fill = "none";
-    placeholderCircle.style.stroke = "#808080";
+    const placeholderCircle = this.createPlaceholderCircle({
+      cx,
+      cy,
+      r: this.r,
+      strokeWidth: this.strokeWidth,
+    });
 
-    const progressCircle = document.createElementNS(NAMESPACE, "circle");
-    progressCircle.classList.add("progress-circle");
-    progressCircle.setAttribute("cx", cx);
-    progressCircle.setAttribute("cy", cy);
-    progressCircle.setAttribute("r", this.r);
-    progressCircle.setAttribute("stroke-width", this.strokeWidth);
-    progressCircle.setAttribute("stroke-dashoffset", this.circumference);
-    progressCircle.setAttribute("stroke-dasharray", this.circumference);
-    progressCircle.style.transform = "rotate(-90deg)";
-    progressCircle.style["transform-origin"] = "50% 50%";
-    progressCircle.style.fill = "transparent";
-    progressCircle.style.stroke = this.color;
-    this.progressCircle = progressCircle;
+    this.progressCircle = this.createProgressCircle({
+      cx,
+      cy,
+      r: this.r,
+      color: this.color,
+      circumference: this.circumference,
+      strokeWidth: this.strokeWidth,
+    });
 
     const legendItem = document.createElement("div");
     legendItem.classList.add("legend-item");
@@ -123,7 +116,7 @@ export default class Slider {
     this.knob = knob;
 
     svg.appendChild(placeholderCircle);
-    svg.appendChild(progressCircle);
+    svg.appendChild(this.progressCircle);
 
     const innerContainer = document.createElement("div");
     innerContainer.classList.add("innerContainer");
@@ -137,10 +130,9 @@ export default class Slider {
     knob.addEventListener("mousedown", this.startMoveKnob.bind(this));
     document.addEventListener("mousemove", this.moveKnob.bind(this));
     placeholderCircle.addEventListener("click", this.moveKnob.bind(this));
-    progressCircle.addEventListener("click", this.moveKnob.bind(this));
+    this.progressCircle.addEventListener("click", this.moveKnob.bind(this));
 
     // touch events
-
     knob.addEventListener("touchstart", this.startTouchKnob.bind(this));
     document.addEventListener("touchmove", this.moveKnob.bind(this), {
       passive: false,
@@ -206,5 +198,28 @@ export default class Slider {
     if (value % this.step === 0) {
       this.legendItemValue.textContent = value;
     }
+  }
+
+  createPlaceholderCircle({ cx, cy, r, strokeWidth }) {
+    const placeholder = document.createElementNS(NAMESPACE, "circle");
+    placeholder.classList.add("placeholder-circle");
+    placeholder.setAttribute("cx", cx);
+    placeholder.setAttribute("cy", cy);
+    placeholder.setAttribute("r", r);
+    placeholder.setAttribute("stroke-width", strokeWidth);
+    placeholder.setAttribute("stroke-dasharray", "4 1");
+    return placeholder;
+  }
+  createProgressCircle({ cx, cy, r, color, circumference, strokeWidth }) {
+    const progressCircle = document.createElementNS(NAMESPACE, "circle");
+    progressCircle.classList.add("progress-circle");
+    progressCircle.setAttribute("cx", cx);
+    progressCircle.setAttribute("cy", cy);
+    progressCircle.setAttribute("r", r);
+    progressCircle.setAttribute("stroke-width", strokeWidth);
+    progressCircle.setAttribute("stroke-dashoffset", circumference);
+    progressCircle.setAttribute("stroke-dasharray", circumference);
+    progressCircle.style.stroke = color;
+    return progressCircle;
   }
 }

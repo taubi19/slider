@@ -15,6 +15,17 @@ body,
   justify-content: center;
 }
 
+.placeholder-circle {
+  fill: none;
+  stroke: #808080;
+}
+
+.progress-circle {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  fill: transparent;
+}
+
 .knob {
   border-radius: 50%;
   height: 20px;
