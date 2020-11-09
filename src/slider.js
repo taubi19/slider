@@ -194,10 +194,14 @@ export default class Slider {
     const value = Math.ceil(
       (this.max - this.min) * circumferencePercent + this.min
     );
+
     // update input value regarding to step value
-    if (value % this.step === 0) {
-      this.legendItemValue.textContent = value;
+    const mod = value % this.step;
+    if (mod !== 0) {
+      value += mod;
     }
+
+    this.legendItemValue.textContent = value;
   }
 
   createPlaceholderCircle({ cx, cy, r, strokeWidth }) {
